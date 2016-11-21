@@ -1,0 +1,12 @@
+#!/bin/bash
+
+stack=in-browser-crypto
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+aws cloudformation update-stack \
+  --stack-name $stack \
+  --template-body file://$DIR/cloud.yaml \
+  --capabilities CAPABILITY_IAM --capabilities CAPABILITY_NAMED_IAM && \
+
+  aws cloudformation wait stack-update-complete \
+    --stack-name $stack
