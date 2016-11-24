@@ -1,26 +1,34 @@
 import AWS from 'aws-sdk'
 
-const s3 = new AWS.S3({
-})
+let credentials = new AWS.CognitoIdentityCredentials({
+  IdentityPoolId: 'us-east-1:3553b475-113d-42cf-a803-e35971920137',
+});
 
-export default class DataStore {
+AWS.config.update({
+  region: 'us-east-1',
+  credentials: credentials
+});
+
+let s3 = new AWS.S3()
+
+class DataStore {
+
   constructor() {
-    this._AWS = AWS
   }
 
-  upload () {
-    console.log('UPLOAD');
+  upload (buffer) {
+    return s3.putObject({
+      Bucket: 'in-browser-crypto',
+      Key: 'data-store',
+      Body: buffer,
+    }).promise();
+  }
 
-    var file = document.getElementById("source-file").files[0]
-
-    readFile(file)
-      .then(encryptFile)
-      .then(uploadFile)
-      .then(function(resp) {
-        console.log('enc resp', resp);
-      })
-      .catch(function(err){
-        console.log(err);
-      })
+  download() {
+    return s3.getObject({
+      Bucket: 'in-browser-crypto',
+      Key: 'data-store',
+    }).promise();
   }
 }
+export default DataStore

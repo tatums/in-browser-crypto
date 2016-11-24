@@ -1,4 +1,4 @@
-import AWS from 'aws-sdk'
+import DataStore from './data_store'
 
 class Crypto {
 
@@ -8,6 +8,9 @@ class Crypto {
   }
 
   generateKeys () {
+    this.iv = window.crypto.getRandomValues(new Uint8Array(12))
+    document.querySelector('#iv').innerHTML = JSON.stringify(this.iv)
+
     return window.crypto.subtle.generateKey(
       { name: "AES-GCM", length: 256, },
       true,
@@ -17,21 +20,21 @@ class Crypto {
       this.key = key
       return window.crypto.subtle.exportKey("jwk", key)
     })
-    .then(key => {
-      document.querySelector('#key').innerHTML = JSON.stringify(key)
+    .then(exportKey => {
+      document.querySelector('#key').innerHTML = JSON.stringify(exportKey)
     })
   }
-
 
   upload () {
     let file = window.document.getElementById("file-upload").files[0]
     let reader = new window.FileReader()
+    let ds = new DataStore
     reader.readAsArrayBuffer(file)
 
     reader.onload = (resp) => {
       let data = resp.target.result
       this.encrypt(data, this.key)
-        .then(this.uploadFile)
+        .then(ds.upload)
         .then(resp => {
           console.log('RESP', resp);
         })
@@ -42,7 +45,8 @@ class Crypto {
   }
 
   download () {
-    this.downloadFile()
+    let ds = new DataStore
+    ds.download()
       .then(this.decryptFile.bind(this))
       .then(this.appendFileToPage.bind(this))
       .then (resp => {
@@ -55,8 +59,6 @@ class Crypto {
   //PRIVATE/////////////////////////////////////////////////////
 
   encrypt(data, key) {
-    this.iv = window.crypto.getRandomValues(new Uint8Array(12))
-    document.querySelector('#iv').innerHTML = JSON.stringify(this.iv)
 
     return window.crypto.subtle.encrypt(
       { name: "AES-GCM", iv: this.iv, tagLength: 128 },
@@ -73,35 +75,13 @@ class Crypto {
       })
   }
 
-  uploadFile(buffer) {
-
-    let s3 = new AWS.S3({
-    })
-
-    return s3.putObject({
-      Bucket: 'in-browser-crypto',
-      ACL: 'public-read',
-      Key: 'es6-test',
-      Body: buffer,
-    }).promise();
-  }
-
-
-  downloadFile() {
-    let s3 = new AWS.S3({
-    })
-    return s3.getObject({
-      Bucket: 'in-browser-crypto',
-      Key: 'es6-test'
-    }).promise();
-  }
-
   decryptFile(s3Obj) {
     let iv          = s3Obj.Body.slice(0, 12) // first 12 is the IV
     let ciphertext  = s3Obj.Body.slice(12); // Remainder is ciphertext
+    let key = this.key
     return window.crypto.subtle.decrypt(
       { name: "AES-GCM", iv: iv, tagLength: 128 },
-      this.key,
+      key,
       ciphertext
     )
   }
@@ -115,7 +95,6 @@ class Crypto {
         <a href="${url}">download</a>
        </li>`)
   }
-
 
 }
 

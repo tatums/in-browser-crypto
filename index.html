@@ -4,28 +4,57 @@
     <meta charset="UTF-8">
     <title>in browser crypto</title>
     <script type="text/javascript" src="bundle.js" charset="utf-8"></script>
+    <link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
   </head>
 
+
   <body>
-    <h1>CryptDis</h1>
-    <div>
-      <button id="generate-keys" onclick="CryptIt.crypt.generateKeys()">Gen Keys</button>
-      <section>
-        <code id="key"></code>
-        <code id="iv"></code>
-      </section>
-    </div>
-    <div>
-      <input type="file" id="file-upload">
-    </div>
-    <button onclick="CryptIt.crypt.upload()">Upload</button>
+    <div class="container">
 
-    <hr />
+      <div class="row">
+        <div class="twelve columns">
+          <h1>AES-GCM</h1>
+        </div>
+      </div>
 
-    <div>
-      <button onclick="CryptIt.crypt.download()">Download</button>
-      <section id="download-links"></section>
-    </div>
+      <div class="row">
+        <div class="four columns">
+          <h4>Generate Keys</h4>
+          <button id="generate-keys" onclick="CryptIt.crypt.generateKeys()">Gen Keys</button>
+        </div>
+        <div class="four columns">
+          <h4>Upload</h4>
+          <input type="file" id="file-upload">
+          <button onclick="CryptIt.crypt.upload()">Upload</button>
+        </div>
+        <div class="four columns">
+          <h4>Download</h4>
+          <button onclick="CryptIt.crypt.download()">Download</button>
+          <div id="download-links"></div>
+        </div>
+      </div> <!-- row END -->
+
+      <div class="row">
+        <div class="twelve columns">
+          <pre><code id="key"></code></pre>
+          <pre><code id="iv"></code></pre>
+        </div>
+      </div> <!-- row END -->
+
+      <hr />
+
+      <div class="row">
+        <div class="twelve columns">
+          <h1>RSA-OAEP</h1>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="one column">One</div>
+        <div class="eleven columns">Eleven</div>
+      </div> <!-- row END -->
+
+    </div> <!-- container END -->
 
   </body>
 
